@@ -26,6 +26,20 @@ Services **precisam** se chamar exatamente `db` e `redis`, e o usuário/senha
 do Postgres precisam ser `postgres`/`postgres` — não são configuráveis via env
 sem rebuildar as imagens.
 
+## Segurança dos containers
+
+Todos os containers rodam com `allowPrivilegeEscalation: false` e capabilities
+dropadas. `redis`, `vote`, `result` e `worker` também rodam com
+`runAsNonRoot`, `runAsUser` fixo e `readOnlyRootFilesystem: true` (validado
+via deploy de teste — `vote` e `worker` precisaram de um `emptyDir` em `/tmp`
+para isso funcionar). O `db` é a única exceção: o entrypoint oficial da
+imagem `postgres:15-alpine` precisa rodar como root para ajustar
+permissões do data dir antes de trocar para o usuário `postgres` — validado
+empiricamente que `runAsNonRoot`/`readOnlyRootFilesystem`/`drop: ALL` quebram
+o start dela. As imagens `vote`, `result` e `worker` são pinadas por digest
+(`@sha256:...`) em vez de depender só da tag `latest`, já que o mantenedor
+não publica tags de versão para elas.
+
 ## Pré-requisitos
 
 - Cluster EKS provisionado (ver `../terraform`) com o addon `aws-ebs-csi-driver`

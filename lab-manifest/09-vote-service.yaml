@@ -1,3 +1,4 @@
+---
 # type: LoadBalancer - o AWS Cloud Controller Manager provisiona um Network
 # Load Balancer automaticamente (gera custo continuo enquanto o Service
 # existir). A annotation abaixo pede NLB em vez do Classic ELB legado

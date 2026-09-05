@@ -5,6 +5,10 @@ module "eks" {
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
 
+  # Todos os 5 tipos de log do control plane (o default do modulo cobre
+  # so api/audit/authenticator, faltando controllerManager e scheduler).
+  cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+
   cluster_endpoint_public_access       = true
   cluster_endpoint_private_access      = true
   cluster_endpoint_public_access_cidrs = var.cluster_endpoint_public_access_cidrs

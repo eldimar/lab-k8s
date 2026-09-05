@@ -1,3 +1,4 @@
+---
 # Nome do Service precisa ser "db" - e o hostname fixo usado na connection
 # string das imagens dockersamples/examplevotingapp_worker e _result.
 apiVersion: v1

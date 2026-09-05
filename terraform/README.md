@@ -35,6 +35,14 @@ cluster_endpoint_public_access_cidrs = ["SEU_IP_PUBLICO/32"]
 Ou desabilite o acesso público totalmente (`cluster_endpoint_public_access = false`)
 e acesse via VPN/bastion apenas pela rede privada.
 
+## Gap conhecido: VPC Flow Logs
+
+VPC Flow Logs não estão habilitados (identificado pelo `tfsec`). Dá visibilidade
+de tráfego de rede útil para investigar incidentes, mas gera custo contínuo de
+ingestão/armazenamento (CloudWatch Logs ou S3) — por isso não foi habilitado
+por padrão neste lab. Para produção, habilite via `flow_log_*` no módulo
+`terraform-aws-modules/vpc/aws` em `vpc.tf`.
+
 ## Pré-requisitos
 
 - Terraform >= 1.6

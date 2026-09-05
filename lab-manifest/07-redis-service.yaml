@@ -1,3 +1,4 @@
+---
 # Nome do Service precisa ser "redis" - hostname fixo usado pelas imagens
 # dockersamples/examplevotingapp_vote e _worker.
 apiVersion: v1

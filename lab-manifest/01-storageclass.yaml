@@ -1,3 +1,4 @@
+---
 # StorageClass explicita usando o driver CSI (o addon aws-ebs-csi-driver
 # provisionado via Terraform), ja que o EKS nao cria mais um default
 # baseado no provisioner in-tree (kubernetes.io/aws-ebs), removido desde

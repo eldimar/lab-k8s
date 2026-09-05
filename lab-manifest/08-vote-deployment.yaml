@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,9 +20,20 @@ spec:
         app.kubernetes.io/part-of: voting-app
         app.kubernetes.io/component: frontend
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: vote
       containers:
         - name: vote
-          image: dockersamples/examplevotingapp_vote:latest
+          # Tag "latest" pinada por digest (nao ha tags de versao publicadas
+          # pelo mantenedor para esta imagem) para builds reprodutiveis.
+          image: dockersamples/examplevotingapp_vote:latest@sha256:7102d3b952ec84e3541ee12e7217e320c52aed60b13501c3158f46376a907466
           ports:
             - containerPort: 80
               name: http
@@ -48,3 +60,14 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            # gunicorn precisa de um /tmp gravavel para arquivos de worker
+            # (workertmp) mesmo com readOnlyRootFilesystem.
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

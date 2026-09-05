@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -24,7 +25,9 @@ spec:
     spec:
       containers:
         - name: worker
-          image: dockersamples/examplevotingapp_worker:latest
+          # Tag "latest" pinada por digest (nao ha tags de versao publicadas
+          # pelo mantenedor para esta imagem) para builds reprodutiveis.
+          image: dockersamples/examplevotingapp_worker:latest@sha256:c8a8571065479c12567e8e440836e543d185c678cd4781a32b100f71e8f39c86
           resources:
             requests:
               cpu: 100m
@@ -36,3 +39,15 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            # o runtime .NET (CoreCLR) precisa de /tmp gravavel mesmo com
+            # readOnlyRootFilesystem (falha com "Failed to create CoreCLR"
+            # sem isso).
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,9 +20,20 @@ spec:
         app.kubernetes.io/part-of: voting-app
         app.kubernetes.io/component: frontend
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: result
       containers:
         - name: result
-          image: dockersamples/examplevotingapp_result:latest
+          # Tag "latest" pinada por digest (nao ha tags de versao publicadas
+          # pelo mantenedor para esta imagem) para builds reprodutiveis.
+          image: dockersamples/examplevotingapp_result:latest@sha256:06c50992ab258e1d83406784040842bb920f6938eabac19261e7ec634f878935
           ports:
             - containerPort: 80
               name: http
@@ -48,3 +60,6 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true

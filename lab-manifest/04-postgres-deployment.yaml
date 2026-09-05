@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,6 +8,9 @@ metadata:
     app.kubernetes.io/name: db
     app.kubernetes.io/part-of: voting-app
     app.kubernetes.io/component: database
+  annotations:
+    ignore-check.kube-linter.io/run-as-non-root: "entrypoint oficial do postgres:15-alpine precisa de root para chown/chmod do data dir antes de trocar para o usuario postgres via gosu (testado empiricamente)"
+    ignore-check.kube-linter.io/no-read-only-root-fs: "entrypoint precisa escrever no socket dir (/var/run/postgresql) e em arquivos temporarios na raiz (testado empiricamente)"
 spec:
   replicas: 1
   # Recreate evita que dois pods tentem montar o mesmo PVC ReadWriteOnce
@@ -57,9 +61,12 @@ spec:
             periodSeconds: 20
           # O entrypoint oficial da imagem precisa rodar como root para
           # ajustar dono/permissoes do diretorio de dados e so entao
-          # trocar para o usuario postgres via gosu (chown/setuid). Um
-          # securityContext com "drop: ALL" quebra esse processo de start
-          # (Operation not permitted no chown/chmod).
+          # trocar para o usuario postgres via gosu (chown/setuid). Testado
+          # empiricamente: runAsNonRoot + readOnlyRootFilesystem quebram o
+          # start ("Read-only file system" no socket dir, "Operation not
+          # permitted" no chmod do data dir) e "drop: ALL" tambem quebra
+          # (Operation not permitted no chown/chmod). Por isso este container
+          # roda como root, diferente dos demais do app.
           securityContext:
             allowPrivilegeEscalation: false
       volumes:
