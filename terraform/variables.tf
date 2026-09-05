@@ -13,7 +13,7 @@ variable "cluster_name" {
 variable "cluster_version" {
   description = "Versao do Kubernetes para o cluster EKS"
   type        = string
-  default     = "1.30"
+  default     = "1.36"
 }
 
 variable "vpc_cidr" {
