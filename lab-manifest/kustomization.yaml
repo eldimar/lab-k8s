@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - 00-namespace.yaml
+  - 01-storageclass.yaml
   - 02-postgres-secret.yaml
   - 03-postgres-pvc.yaml
   - 04-postgres-deployment.yaml
