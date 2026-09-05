@@ -9,8 +9,13 @@ metadata:
     app.kubernetes.io/part-of: voting-app
     app.kubernetes.io/component: database
   annotations:
-    ignore-check.kube-linter.io/run-as-non-root: "entrypoint oficial do postgres:15-alpine precisa de root para chown/chmod do data dir antes de trocar para o usuario postgres via gosu (testado empiricamente)"
-    ignore-check.kube-linter.io/no-read-only-root-fs: "entrypoint precisa escrever no socket dir (/var/run/postgresql) e em arquivos temporarios na raiz (testado empiricamente)"
+    ignore-check.kube-linter.io/run-as-non-root: >-
+      entrypoint oficial do postgres:15-alpine precisa de root para
+      chown/chmod do data dir antes de trocar para o usuario postgres via
+      gosu (testado empiricamente)
+    ignore-check.kube-linter.io/no-read-only-root-fs: >-
+      entrypoint precisa escrever no socket dir (/var/run/postgresql) e em
+      arquivos temporarios na raiz (testado empiricamente)
 spec:
   replicas: 1
   # Recreate evita que dois pods tentem montar o mesmo PVC ReadWriteOnce

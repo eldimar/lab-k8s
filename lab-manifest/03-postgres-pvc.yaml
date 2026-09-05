@@ -7,7 +7,9 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: gp3
+  # Sem storageClassName: usa a StorageClass default do cluster
+  # (kind: "standard"/local-path; EKS real: crie/aponte uma gp3 via
+  # aws-ebs-csi-driver).
   resources:
     requests:
       storage: 5Gi
