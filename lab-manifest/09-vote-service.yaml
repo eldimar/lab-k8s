@@ -1,0 +1,21 @@
+# type: NodePort - cluster local (kind) nao tem cloud provider para
+# satisfazer type: LoadBalancer (o Service ficaria "Pending" pra sempre).
+# Em um EKS real, troque para type: LoadBalancer (AWS Cloud Controller
+# Manager provisiona um NLB automaticamente - gera custo continuo).
+apiVersion: v1
+kind: Service
+metadata:
+  name: vote
+  namespace: voting-app
+  labels:
+    app.kubernetes.io/name: vote
+    app.kubernetes.io/part-of: voting-app
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: vote
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+      name: http

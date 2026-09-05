@@ -1,0 +1,17 @@
+# Nome do Service precisa ser "db" - e o hostname fixo usado na connection
+# string das imagens dockersamples/examplevotingapp_worker e _result.
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: voting-app
+  labels:
+    app.kubernetes.io/name: db
+    app.kubernetes.io/part-of: voting-app
+spec:
+  selector:
+    app.kubernetes.io/name: db
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: postgres

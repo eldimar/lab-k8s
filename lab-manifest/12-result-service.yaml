@@ -1,0 +1,19 @@
+# type: NodePort - ver comentario em 09-vote-service.yaml sobre a diferenca
+# para um EKS real (type: LoadBalancer).
+apiVersion: v1
+kind: Service
+metadata:
+  name: result
+  namespace: voting-app
+  labels:
+    app.kubernetes.io/name: result
+    app.kubernetes.io/part-of: voting-app
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: result
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30081
+      name: http

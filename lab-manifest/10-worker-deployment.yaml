@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: voting-app
+  labels:
+    app.kubernetes.io/name: worker
+    app.kubernetes.io/part-of: voting-app
+    app.kubernetes.io/component: worker
+spec:
+  # Multiplas replicas do worker competem para consumir a mesma fila no
+  # Redis sem duplicar processamento, mas 1 replica ja e suficiente para o
+  # volume de um app interno de votacao.
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: worker
+        app.kubernetes.io/part-of: voting-app
+        app.kubernetes.io/component: worker
+    spec:
+      containers:
+        - name: worker
+          image: dockersamples/examplevotingapp_worker:latest
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
