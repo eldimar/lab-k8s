@@ -1,0 +1,49 @@
+---
+# Gateway API (kubernetes/ingress-nginx foi descontinuado - EOL em 31/03/2026,
+# repositorio arquivado - a API Ingress em si continua existindo, mas o
+# controller usado antes nao). Implementacao: NGINX Gateway Fabric (sucessor
+# oficial mantido pela F5/nginx), instalado no cluster - ver
+# lab-manifest/README.md.
+#
+# Um listener HTTP (porta 80, so para redirecionar - ver 16-httproutes.yaml)
+# e um listener HTTPS dedicado por host, cada um com seu proprio certificado
+# TLS emitido pelo cert-manager (14-certificates.yaml).
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: voting-app
+  namespace: voting-app
+spec:
+  gatewayClassName: nginx
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      hostname: "*.voting-app.local"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: vote-https
+      port: 443
+      protocol: HTTPS
+      hostname: vote.voting-app.local
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: vote-tls
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: result-https
+      port: 443
+      protocol: HTTPS
+      hostname: result.voting-app.local
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: result-tls
+      allowedRoutes:
+        namespaces:
+          from: Same

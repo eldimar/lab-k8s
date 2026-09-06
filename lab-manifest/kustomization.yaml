@@ -16,4 +16,5 @@ resources:
   - 12-result-service.yaml
   - 13-cert-manager-issuer.yaml
   - 14-certificates.yaml
-  - 15-ingress.yaml
+  - 15-gateway.yaml
+  - 16-httproutes.yaml
