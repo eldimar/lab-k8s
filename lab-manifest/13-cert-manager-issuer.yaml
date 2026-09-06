@@ -1,0 +1,14 @@
+---
+# ClusterIssuer do cert-manager (precisa estar instalado no cluster - ver
+# lab-manifest/README.md). SelfSigned porque este e um lab local sem DNS
+# publico (Let's Encrypt HTTP-01/DNS-01 nao se aplicam aqui); em um ambiente
+# real com dominio publico, troque por um Issuer ACME (Let's Encrypt).
+#
+# Recurso cluster-scoped (nao pertence ao namespace voting-app), mas e
+# usado apenas pelos Certificates deste app.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}

@@ -1,8 +1,7 @@
 ---
-# type: NodePort - cluster local (kind) nao tem cloud provider para
-# satisfazer type: LoadBalancer (o Service ficaria "Pending" pra sempre).
-# Em um EKS real, troque para type: LoadBalancer (AWS Cloud Controller
-# Manager provisiona um NLB automaticamente - gera custo continuo).
+# type: ClusterIP - o Service nao e mais exposto diretamente (NodePort);
+# a exposicao externa agora e feita pelo Ingress (15-ingress.yaml), que
+# tambem centraliza TLS. Ver 13/14 para o certificado (cert-manager).
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,11 +11,10 @@ metadata:
     app.kubernetes.io/name: vote
     app.kubernetes.io/part-of: voting-app
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: vote
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30080
       name: http

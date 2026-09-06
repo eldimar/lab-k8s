@@ -5,8 +5,7 @@ kind: Kustomization
 resources:
   - 00-namespace.yaml
   - 02-postgres-secret.yaml
-  - 03-postgres-pvc.yaml
-  - 04-postgres-deployment.yaml
+  - 04-postgres-statefulset.yaml
   - 05-postgres-service.yaml
   - 06-redis-deployment.yaml
   - 07-redis-service.yaml
@@ -15,3 +14,6 @@ resources:
   - 10-worker-deployment.yaml
   - 11-result-deployment.yaml
   - 12-result-service.yaml
+  - 13-cert-manager-issuer.yaml
+  - 14-certificates.yaml
+  - 15-ingress.yaml

@@ -1,0 +1,30 @@
+---
+# Certificados digitais TLS gerenciados pelo cert-manager: ele gera a
+# chave privada, assina o certificado via selfsigned-issuer e mantem os
+# Secrets abaixo atualizados automaticamente (incluindo renovacao), em vez
+# de um certificado colado manualmente num Secret.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: vote-tls
+  namespace: voting-app
+spec:
+  secretName: vote-tls
+  dnsNames:
+    - vote.voting-app.local
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: result-tls
+  namespace: voting-app
+spec:
+  secretName: result-tls
+  dnsNames:
+    - result.voting-app.local
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer

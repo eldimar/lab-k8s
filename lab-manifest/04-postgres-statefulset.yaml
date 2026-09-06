@@ -1,6 +1,11 @@
 ---
+# StatefulSet (nao Deployment) porque o Postgres precisa de armazenamento
+# persistente proprio por replica, identidade de rede estavel (db-0) e
+# start/stop ordenado - e o tipo de workload correto para um banco de dados
+# no Kubernetes. O PVC agora vem de volumeClaimTemplates (gerenciado pelo
+# proprio StatefulSet) em vez de um PVC solto referenciado pelo Deployment.
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: db
   namespace: voting-app
@@ -17,11 +22,8 @@ metadata:
       entrypoint precisa escrever no socket dir (/var/run/postgresql) e em
       arquivos temporarios na raiz (testado empiricamente)
 spec:
+  serviceName: db
   replicas: 1
-  # Recreate evita que dois pods tentem montar o mesmo PVC ReadWriteOnce
-  # simultaneamente durante um rollout.
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: db
@@ -74,7 +76,15 @@ spec:
           # roda como root, diferente dos demais do app.
           securityContext:
             allowPrivilegeEscalation: false
-      volumes:
-        - name: postgres-data
-          persistentVolumeClaim:
-            claimName: postgres-data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        # Sem storageClassName: usa a StorageClass default do cluster
+        # (kind: "standard"/local-path; EKS real: crie/aponte uma gp3 via
+        # aws-ebs-csi-driver).
+        resources:
+          requests:
+            storage: 5Gi

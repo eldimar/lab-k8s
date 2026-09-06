@@ -1,6 +1,12 @@
 ---
 # Nome do Service precisa ser "db" - e o hostname fixo usado na connection
 # string das imagens dockersamples/examplevotingapp_worker e _result.
+#
+# clusterIP: None (headless) porque este e o Service "governing" exigido
+# pelo StatefulSet (spec.serviceName em 04-postgres-statefulset.yaml). Com
+# 1 replica, "db" resolve via DNS direto para o IP do pod db-0 - continua
+# funcionando como hostname fixo para o app, e e o padrao correto para
+# StatefulSets (identidade de rede estavel por pod: db-0.db.voting-app...).
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,6 +16,7 @@ metadata:
     app.kubernetes.io/name: db
     app.kubernetes.io/part-of: voting-app
 spec:
+  clusterIP: None
   selector:
     app.kubernetes.io/name: db
   ports:

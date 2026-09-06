@@ -1,6 +1,6 @@
 ---
-# type: NodePort - ver comentario em 09-vote-service.yaml sobre a diferenca
-# para um EKS real (type: LoadBalancer).
+# type: ClusterIP - ver comentario em 09-vote-service.yaml: exposicao
+# externa agora via Ingress (15-ingress.yaml).
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,11 +10,10 @@ metadata:
     app.kubernetes.io/name: result
     app.kubernetes.io/part-of: voting-app
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: result
   ports:
     - port: 80
       targetPort: 80
-      nodePort: 30081
       name: http

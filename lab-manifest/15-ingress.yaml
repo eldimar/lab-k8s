@@ -1,0 +1,42 @@
+---
+# Ingress (ingress-nginx precisa estar instalado no cluster - ver
+# lab-manifest/README.md) - substitui os NodePorts como forma de expor
+# vote/result, com TLS terminado usando os certificados gerados pelo
+# cert-manager em 14-certificates.yaml.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: voting-app
+  namespace: voting-app
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - vote.voting-app.local
+      secretName: vote-tls
+    - hosts:
+        - result.voting-app.local
+      secretName: result-tls
+  rules:
+    - host: vote.voting-app.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vote
+                port:
+                  number: 80
+    - host: result.voting-app.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: result
+                port:
+                  number: 80
