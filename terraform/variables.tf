@@ -67,12 +67,12 @@ variable "node_max_size" {
 variable "cluster_endpoint_public_access_cidrs" {
   description = <<-EOT
     CIDRs autorizados a acessar o endpoint publico da API do EKS.
-    Por padrao esta liberado para 0.0.0.0/0 (qualquer origem), o que NAO
-    e recomendado fora de laboratorio. Restrinja para o(s) IP(s) publico(s)
-    de quem vai rodar kubectl, ex: ["203.0.113.10/32"].
+    Sem default proposital (0.0.0.0/0 nao e um default seguro para deixar
+    disponivel "de graca"): defina explicitamente o(s) IP(s) publico(s) de
+    quem vai rodar kubectl, ex: ["203.0.113.10/32"]. terraform plan falha
+    ate isso ser definido em terraform.tfvars.
   EOT
   type        = list(string)
-  default     = ["0.0.0.0/0"]
 }
 
 variable "node_capacity_type" {

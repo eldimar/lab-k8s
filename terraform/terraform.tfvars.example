@@ -7,3 +7,7 @@ node_desired_size   = 2
 node_min_size       = 1
 node_max_size       = 3
 node_capacity_type  = "ON_DEMAND"
+
+# Obrigatorio - sem default por design (ver variables.tf). Troque pelo seu
+# IP publico (ex: `curl -s ifconfig.me`), nao deixe 0.0.0.0/0.
+cluster_endpoint_public_access_cidrs = ["SEU_IP_PUBLICO/32"]

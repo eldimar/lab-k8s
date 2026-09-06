@@ -7,8 +7,31 @@ Provisiona a infraestrutura AWS necessária para rodar o app de votação:
 - Managed Node Group EC2 (t3.medium, 1-3 nodes, ON_DEMAND)
 - Addons gerenciados: coredns, kube-proxy, vpc-cni, aws-ebs-csi-driver
 
-State é local (`terraform.tfstate`), adequado para laboratório/teste. Para uso
-real, migrar para backend remoto (S3 + DynamoDB).
+State é local (`terraform.tfstate`), adequado para laboratório/teste.
+
+## Backend remoto (recomendado para uso real)
+
+`versions.tf` já traz um bloco `backend "s3"` pronto, comentado (desativado
+por padrão neste lab — exigiria criar um bucket S3 só para isso, sem
+necessidade enquanto o resto também não é aplicado). Ele usa `use_lockfile`
+(Terraform >= 1.10), o locking nativo do backend S3 — dispensa a tabela
+DynamoDB que o padrão S3+DynamoDB exigia antes.
+
+Para ativar:
+
+```bash
+# 1. Crie o bucket (nome globalmente unico) com versionamento e criptografia
+aws s3api create-bucket --bucket SEU_BUCKET_DE_STATE --region us-east-1
+aws s3api put-bucket-versioning --bucket SEU_BUCKET_DE_STATE \
+  --versioning-configuration Status=Enabled
+aws s3api put-bucket-encryption --bucket SEU_BUCKET_DE_STATE \
+  --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+
+# 2. Descomente o bloco backend "s3" em versions.tf (ajuste bucket/region)
+
+# 3. Migre o state local para o S3
+terraform init -migrate-state
+```
 
 ## Boas práticas aplicadas
 
@@ -20,20 +43,18 @@ real, migrar para backend remoto (S3 + DynamoDB).
 - Nodes em subnets privadas; load balancers expostos via subnets públicas
 - `authentication_mode = API_AND_CONFIG_MAP` (acesso via EKS Access Entries)
 
-## Atenção: endpoint público do EKS
+## Endpoint público do EKS
 
-Por padrão, `cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]`, ou seja,
-o endpoint da API fica acessível publicamente de qualquer IP (apenas com
-autenticação IAM, mas ainda assim uma superfície de ataque desnecessária).
-
-**Antes de aplicar em algo além de um teste rápido**, restrinja para o seu IP:
+`cluster_endpoint_public_access_cidrs` não tem default — é proposital, para
+não ter um "0.0.0.0/0 disponível de graça" caso alguém esqueça de definir.
+`terraform plan`/`apply` falham até você definir em `terraform.tfvars`:
 
 ```hcl
 cluster_endpoint_public_access_cidrs = ["SEU_IP_PUBLICO/32"]
 ```
 
-Ou desabilite o acesso público totalmente (`cluster_endpoint_public_access = false`)
-e acesse via VPN/bastion apenas pela rede privada.
+Ou desabilite o acesso público totalmente (`cluster_endpoint_public_access = false`
+em `eks.tf`) e acesse via VPN/bastion apenas pela rede privada.
 
 ## Gap conhecido: VPC Flow Logs
 
